@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interaktywny Sprawdzian - Lalka</title>
+    <style>
+        /* ZMIENNE KOLORYSTYCZNE - TRYB JASNY (DOMYŚLNY) */
+        :root {
+            --bg-body: #eef2f5;
+            --bg-container: #fff;
+            --text-main: #333;
+            --text-heading: #2c3e50;
+            --text-subheading: #2980b9;
+            --border-color: #ddd;
+            --border-input: #ccc;
+            --bg-input: #fff;
+            --bg-th: #f9f9f9;
+            --bg-options: #e8f4f8;
+            --bg-inline-select: #f9f9f9;
+            
+            --bg-correct: #d4edda;
+            --border-correct: #c3e6cb;
+            --text-correct: #155724;
+            
+            --bg-incorrect: #f8d7da;
+            --border-incorrect: #f5c6cb;
+            --text-incorrect: #721c24;
+            
+            --bg-feedback: #fff3cd;
+            --text-feedback-h: #856404;
+        }
+
+        /* ZMIENNE KOLORYSTYCZNE - TRYB CIEMNY */
+        body.dark-mode {
+            --bg-body: #121212;
+            --bg-container: #1e1e1e;
+            --text-main: #e0e0e0;
+            --text-heading: #64b5f6;
+            --text-subheading: #4fc3f7;
+            --border-color: #444;
+            --border-input: #555;
+            --bg-input: #2d2d2d;
+            --bg-th: #2a2a2a;
+            --bg-options: #1a2634;
+            --bg-inline-select: #2a2a2a;
+            
+            --bg-correct: #1a3a22;
+            --border-correct: #28a745;
+            --text-correct: #85e09b;
+            
+            --bg-incorrect: #4a1a1e;
+            --border-incorrect: #dc3545;
+            --text-incorrect: #f08a93;
+            
+            --bg-feedback: #332b00;
+            --text-feedback-h: #ffda6a;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 20px;
+            transition: background-color 0.3s, color 0.3s;
+        }
+        .container {
+            max-width: 850px;
+            margin: 0 auto;
+            background: var(--bg-container);
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: background-color 0.3s;
+            position: relative;
+        }
+        
+        /* PRZYCISK ZMIANY MOTYWU */
+        .theme-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background-color: var(--text-heading);
+            color: var(--bg-container);
+            border: none;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+        .theme-toggle:hover { opacity: 0.8; }
+
+        h1 { text-align: center; color: var(--text-heading); border-bottom: 2px solid #3498db; padding-bottom: 10px; margin-top: 20px; }
+        h3 { margin-top: 35px; color: var(--text-subheading); border-left: 4px solid #3498db; padding-left: 10px; }
+        table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+        th, td { border: 1px solid var(--border-color); padding: 12px; text-align: left; }
+        th { background-color: var(--bg-th); }
+        .center { text-align: center; }
+        
+        input[type="text"], textarea, select {
+            width: 100%; padding: 10px; border: 1px solid var(--border-input); border-radius: 5px; box-sizing: border-box; 
+            font-family: inherit; margin-top: 5px; background-color: var(--bg-input); color: var(--text-main);
+        }
+        textarea { resize: vertical; height: 80px; }
+        
+        .inline-selects { display: flex; flex-wrap: wrap; gap: 15px; }
+        .inline-selects > div { 
+            flex: 1 1 45%; display: flex; align-items: center; justify-content: space-between; 
+            background: var(--bg-inline-select); padding: 8px 12px; border-radius: 5px; border: 1px solid var(--border-color); 
+        }
+        .inline-selects select { width: 70px; margin-left: 10px; font-weight: bold;}
+        
+        .options-list { background: var(--bg-options); padding: 15px; border-radius: 5px; font-size: 0.9em; margin-bottom: 20px; border-left: 4px solid #3498db;}
+        
+        /* Style do sprawdzania */
+        .correct { background-color: var(--bg-correct) !important; border-color: var(--border-correct) !important; color: var(--text-correct) !important; }
+        .incorrect { background-color: var(--bg-incorrect) !important; border-color: var(--border-incorrect) !important; color: var(--text-incorrect) !important; }
+        
+        .feedback-box {
+            display: none;
+            background-color: var(--bg-feedback);
+            border-left: 5px solid #ffc107;
+            padding: 15px;
+            margin-top: 15px;
+            border-radius: 4px;
+            font-size: 0.95em;
+        }
+        .feedback-box h4 { margin-top: 0; color: var(--text-feedback-h); margin-bottom: 10px; }
+        .self-grade { margin-top: 15px; padding-top: 10px; border-top: 1px dashed #ffc107; display: flex; align-items: center; gap: 10px; font-weight: bold; }
+        .self-grade select { width: auto; background-color: #ffc107; color: #000; border: none; font-weight: bold; cursor: pointer; }
+
+        .btn { display: block; width: 100%; padding: 15px; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 30px; transition: 0.3s; text-align: center; }
+        .btn-check { background-color: #3498db; }
+        .btn-check:hover { background-color: #2980b9; }
+        .btn-final { background-color: #27ae60; display: none; margin-top: 40px; font-size: 18px;}
+        .btn-final:hover { background-color: #2ecc71; }
+
+        #result-display { display: none; text-align: center; padding: 30px; margin-top: 30px; border-radius: 8px; font-size: 24px; font-weight: bold; }
+        .result-high { background-color: var(--bg-correct); color: var(--text-correct); border: 2px solid var(--border-correct);}
+        .result-mid { background-color: var(--bg-feedback); color: var(--text-feedback-h); border: 2px solid #ffc107;}
+        .result-low { background-color: var(--bg-incorrect); color: var(--text-incorrect); border: 2px solid var(--border-incorrect);}
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <button id="theme-btn" class="theme-toggle" onclick="toggleTheme()">🌙 Tryb ciemny</button>
+    
+    <h1>Interaktywny Sprawdzian – Lalka</h1>
+    <p style="text-align: center; color: #888;">Rozwiąż test, a następnie kliknij przycisk sprawdzania na dole, aby ocenić swoją wiedzę.</p>
+
+    <form id="quiz-form">
+        <h3>1. Oznacz literą P zdania prawdziwe, a literą F – zdania fałszywe. [0–2 pkt]</h3>
+        <table>
+            <tr>
+                <th>Zdanie</th>
+                <th class="center">Wybór</th>
+            </tr>
+            <tr id="row1_1">
+                <td>Wokulski po raz pierwszy zobaczył Izabelę na kweście wielkanocnej.</td>
+                <td class="center"><select id="z1_1"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
+            </tr>
+            <tr id="row1_2">
+                <td>Wokulski postanowił pomóc Mariannie, gdy odkrył, że jest ofiarą Starskiego.</td>
+                <td class="center"><select id="z1_2"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
+            </tr>
+            <tr id="row1_3">
+                <td>Najlepszym sprzedawcą w sklepie Wokulskiego był Maruszewicz.</td>
+                <td class="center"><select id="z1_3"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
+            </tr>
+            <tr id="row1_4">
+                <td>Prezesową Zasławską łączyło ze stryjem Wokulskiego gorące uczucie.</td>
+                <td class="center"><select id="z1_4"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
+            </tr>
+            <tr id="row1_5">
+                <td>Wokulski pojedynkował się z baronem Krzeszowskim z powodu lalki.</td>
+                <td class="center"><select id="z1_5"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
+            </tr>
+            <tr id="row1_6">
+                <td>Powieść kończy się śmiercią Ignacego Rzeckiego.</td>
+                <td class="center"><select id="z1_6"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
+            </tr>
+        </table>
+
+        <h3>2. Do postaci dopasuj odpowiedni opis. [0–2 pkt]</h3>
+        <div class="options-list">
+            <strong>Opisy:</strong> A. siostra Tomasza Łęckiego | B. włoski aktor | C. zasiada w spółce ze Wschodem | D. gubi metal Geista | E. sprzyja Wokulskiemu | F. planuje rozwijać pasje za granicą | G. emancypantka | H. flirtuje z Izabelą | I. bankrut, wizja sprzedaży kamienicy | J. przyjaciel Augusta Katza | K. donosi o Izabeli | L. skrzypek
+        </div>
+        
+        <div class="inline-selects">
+            <div id="row2_izabela"><label>Izabela Łęcka</label><select id="z2_izabela"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_tomasz"><label>Tomasz Łęcki</label><select id="z2_tomasz"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_ignacy"><label>Ignacy Rzecki</label><select id="z2_ignacy"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_julian"><label>Julian Ochocki</label><select id="z2_julian"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_prezesowa"><label>Prezesowa Zasławska</label><select id="z2_prezesowa"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_starski"><label>Kazimierz Starski</label><select id="z2_starski"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_ksiaze"><label>Książę</label><select id="z2_ksiaze"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_meliton"><label>Pani Meliton</label><select id="z2_meliton"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_rossi"><label>Rossi</label><select id="z2_rossi"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_molinari"><label>Molinari</label><select id="z2_molinari"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_wasowska"><label>Kazimiera Wąsowska</label><select id="z2_wasowska"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+            <div id="row2_hortensja"><label>Hortensja</label><select id="z2_hortensja"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+        </div>
+
+        <h3>3. O czym marzyli bohaterowie Lalki? [0–3 pkt]</h3>
+        <label>Izabela Łęcka</label><input type="text">
+        <label>Stanisław Wokulski</label><input type="text">
+        <label>Julian Ochocki</label><input type="text">
+        <label>Ignacy Rzecki</label><input type="text">
+        <label>Geist</label><input type="text">
+        <div class="feedback-box" id="feedback-3">
+            <h4>Schemat odpowiedzi:</h4>
+            <ul>
+                <li><strong>Izabela:</strong> o miłości idealnej ("posąg Apollina"), o bogatym mężu arystokracie.</li>
+                <li><strong>Wokulski:</strong> zdobycie Izabeli, wielkie odkrycia naukowe.</li>
+                <li><strong>Ochocki:</strong> machina latająca, poświęcenie się nauce.</li>
+                <li><strong>Rzecki:</strong> sprawiedliwość dziejowa (zwycięstwo Bonapartych), ślub Wokulskiego ze Stawską.</li>
+                <li><strong>Geist:</strong> znalezienie następcy, wykorzystanie metalu lżejszego od powietrza dla dobra ludzkości.</li>
+            </ul>
+            <div class="self-grade">Oceń swoje odpowiedzi: 
+                <select id="score_z3"><option value="0">0 pkt</option><option value="1">1 pkt</option><option value="2">2 pkt</option><option value="3">3 pkt</option></select>
+            </div>
+        </div>
+
+        <h3>4. Wypisz cztery zabiegi Wokulskiego, które miały zbliżyć go do Izabeli. [0–3 pkt]</h3>
+        <input type="text" placeholder="1."><input type="text" placeholder="2."><input type="text" placeholder="3."><input type="text" placeholder="4.">
+        <div class="feedback-box" id="feedback-4">
+            <h4>Schemat odpowiedzi (Przykłady):</h4>
+            <p>1. Zdobycie fortuny na wojnie. 2. Wykupienie weksli ojca Izabeli i kamienicy. 3. Płacenie za klakierów dla aktora Rossiego. 4. Założenie spółki do handlu ze Wschodem i danie posady Łęckiemu. 5. Datki na sierociniec/ochronki wspierane przez Izabelę.</p>
+            <div class="self-grade">Oceń swoje odpowiedzi: 
+                <select id="score_z4"><option value="0">0 pkt</option><option value="1">1 pkt</option><option value="2">2 pkt</option><option value="3">3 pkt</option></select>
+            </div>
+        </div>
+
+        <h3>5. Scharakteryzuj wybranego lokatora/lokatorkę kamienicy Wokulskiego. [0–2 pkt]</h3>
+        <textarea></textarea>
+        <div class="feedback-box" id="feedback-5">
+            <h4>Schemat odpowiedzi (Przykłady):</h4>
+            <p><strong>Helena Stawska:</strong> piękna, niezwykle pracowita, utrzymuje się z lekcji muzyki, cnotliwa, skrycie kocha Wokulskiego. LUB <strong>Studenci (np. Maleski):</strong> biedni, cyniczni, dokuczają baronowej, drwią z norm społecznych. LUB <strong>Baronowa Krzeszowska:</strong> zgorzkniała po śmierci córki, intrygantka, kłóci się z sąsiadami.</p>
+            <div class="self-grade">Oceń swoje odpowiedzi: 
+                <select id="score_z5"><option value="0">0 pkt</option><option value="1">1 pkt</option><option value="2">2 pkt</option></select>
+            </div>
+        </div>
+
+        <h3>6. Przedstaw relację między Stanisławem Wokulskim a Ignacym Rzeckim. [0–2 pkt]</h3>
+        <textarea></textarea>
+        <div class="feedback-box" id="feedback-6">
+            <h4>Schemat odpowiedzi:</h4>
+            <p>Byli oddanymi przyjaciółmi, łączyła ich relacja niemal ojcowsko-synowska. Rzecki ufał mu bezgranicznie i dbał o jego interesy, ale zupełnie nie rozumiał jego motywacji (obsesyjnej miłości do arystokratki). Rzecki błędnie przypisywał Wokulskiemu misje polityczne na rzecz Bonapartych.</p>
+            <div class="self-grade">Oceń swoje odpowiedzi: 
+                <select id="score_z6"><option value="0">0 pkt</option><option value="1">1 pkt</option><option value="2">2 pkt</option></select>
+            </div>
+        </div>
+
+        <h3>7. Wymień trzy wydarzenia historyczne przywołane w Lalce. [0–2 pkt]</h3>
+        <input type="text" placeholder="1."><input type="text" placeholder="2."><input type="text" placeholder="3.">
+        <div class="feedback-box" id="feedback-7">
+            <h4>Schemat odpowiedzi:</h4>
+            <p>1. Wiosna Ludów (powstanie na Węgrzech w 1848). <br>2. Powstanie Styczniowe (1863) i późniejsze zsyłki na Syberię. <br>3. Wojna rosyjsko-turecka w Bułgarii (1877-1878).</p>
+            <div class="self-grade">Oceń swoje odpowiedzi: 
+                <select id="score_z7"><option value="0">0 pkt</option><option value="1">1 pkt</option><option value="2">2 pkt</option></select>
+            </div>
+        </div>
+
+        <h3>8. W jaki sposób kończy się historia wymienionych bohaterów? [0–4 pkt]</h3>
+        <label>Stanisław Wokulski</label><textarea></textarea>
+        <label>Izabela Łęcka</label><textarea></textarea>
+        <label>Ignacy Rzecki</label><textarea></textarea>
+        <label>Julian Ochocki</label><textarea></textarea>
+        <div class="feedback-box" id="feedback-8">
+            <h4>Schemat odpowiedzi:</h4>
+            <ul>
+                <li><strong>Wokulski:</strong> los nieznany (otwarte zakończenie) – prawdopodobnie wysadził się w ruinach zamku w Zasławiu, wyjechał do Paryża lub Indii.</li>
+                <li><strong>Izabela:</strong> ponosi klęskę, traci majątek, adoratorów i decyduje się na wyjazd za granicę do klasztoru.</li>
+                <li><strong>Rzecki:</strong> umiera na serce w sklepie (co symbolizuje koniec epoki dawnych romantyków).</li>
+                <li><strong>Ochocki:</strong> wyjeżdża za granicę (do Paryża), by poświęcić życie nauce i pracy z profesorem Geistem.</li>
+            </ul>
+            <div class="self-grade">Oceń swoje odpowiedzi: 
+                <select id="score_z8"><option value="0">0 pkt</option><option value="1">1 pkt</option><option value="2">2 pkt</option><option value="3">3 pkt</option><option value="4">4 pkt</option></select>
+            </div>
+        </div>
+
+        <button type="button" class="btn btn-check" id="btn-check-answers" onclick="revealAnswers()">1. Sprawdź zadania zamknięte i pokaż odpowiedzi</button>
+        <button type="button" class="btn btn-final" id="btn-calculate" onclick="calculateFinalScore()">2. Oblicz mój ostateczny wynik %</button>
+        
+        <div id="result-display"></div>
+    </form>
+</div>
+
+<script>
+    // --- FUNKCJA ZMIANY MOTYWU ---
+    function toggleTheme() {
+        const body = document.body;
+        const btn = document.getElementById('theme-btn');
+        body.classList.toggle('dark-mode');
+        
+        if (body.classList.contains('dark-mode')) {
+            btn.innerHTML = '☀️ Tryb jasny';
+        } else {
+            btn.innerHTML = '🌙 Tryb ciemny';
+        }
+    }
+
+    // Pamięć punktów z zadań automatycznych
+    let autoPoints = 0; 
+
+    function revealAnswers() {
+        // --- SPRAWDZANIE ZADANIA 1 ---
+        const ans1 = ['F', 'F', 'F', 'P', 'F', 'P'];
+        let correct1 = 0;
+        for(let i=1; i<=6; i++) {
+            let el = document.getElementById('z1_'+i);
+            let row = document.getElementById('row1_'+i);
+            if(el.value === ans1[i-1]) {
+                row.classList.add('correct');
+                correct1++;
+            } else if (el.value !== "") {
+                row.classList.add('incorrect');
+            }
+            el.disabled = true; 
+        }
+        let ptsZ1 = 0;
+        if(correct1 === 6) ptsZ1 = 2;
+        else if(correct1 >= 4) ptsZ1 = 1;
+
+        // --- SPRAWDZANIE ZADANIA 2 ---
+        const ans2 = {
+            'tomasz': 'I', 'ignacy': 'J', 'julian': 'F', 'prezesowa': 'E', 
+            'starski': 'H', 'ksiaze': 'C', 'meliton': 'K', 'rossi': 'B', 
+            'molinari': 'L', 'wasowska': 'G', 'hortensja': 'A'
+        };
+        let correct2 = 0;
+        
+        for (const [key, correctVal] of Object.entries(ans2)) {
+            let el = document.getElementById('z2_' + key);
+            let row = document.getElementById('row2_' + key);
+            if(el.value === correctVal) {
+                row.classList.add('correct');
+                correct2++;
+            } else if(el.value !== "") {
+                row.classList.add('incorrect');
+            }
+            el.disabled = true;
+        }
+        document.getElementById('z2_izabela').disabled = true;
+
+        let ptsZ2 = 0;
+        if(correct2 >= 10) ptsZ2 = 2;
+        else if(correct2 >= 6) ptsZ2 = 1;
+
+        autoPoints = ptsZ1 + ptsZ2;
+
+        // Pokaż klucze odpowiedzi do zadań otwartych
+        for(let i=3; i<=8; i++) {
+            document.getElementById('feedback-'+i).style.display = 'block';
+        }
+
+        // Zmień widoczność przycisków
+        document.getElementById('btn-check-answers').style.display = 'none';
+        document.getElementById('btn-calculate').style.display = 'block';
+        
+        alert("Zadania zamknięte zostały ocenione automatycznie! \n\nZjedź w dół, przeczytaj klucze odpowiedzi do zadań otwartych i oceń się wybierając odpowiednią liczbę punktów z żółtych rozwijanych list. Na koniec kliknij zielony przycisk obliczania wyniku.");
+    }
+
+    function calculateFinalScore() {
+        let maxPoints = 20; 
+        let manualPoints = 0;
+        
+        for(let i=3; i<=8; i++) {
+            let val = parseInt(document.getElementById('score_z'+i).value);
+            if(!isNaN(val)) manualPoints += val;
+        }
+
+        let totalPoints = autoPoints + manualPoints;
+        let percentage = Math.round((totalPoints / maxPoints) * 100);
+
+        let resultDiv = document.getElementById('result-display');
+        resultDiv.style.display = 'block';
+        
+        let message = `Twój wynik: ${totalPoints} / ${maxPoints} pkt (${percentage}%)<br>`;
+        
+        if(percentage >= 85) {
+            resultDiv.className = 'result-high';
+            message += "🌟 Rewelacja! Sprawdzian masz w małym palcu.";
+        } else if(percentage >= 50) {
+            resultDiv.className = 'result-mid';
+            message += "👍 Całkiem nieźle, ale warto jeszcze powtórzyć detale!";
+        } else {
+            resultDiv.className = 'result-low';
+            message += "📚 Musisz jeszcze trochę doczytać. Głowa do góry!";
+        }
+        
+        resultDiv.innerHTML = message;
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
