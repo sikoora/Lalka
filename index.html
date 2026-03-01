@@ -184,6 +184,18 @@
                 <td class="center"><select id="z1_6"><option value="">-</option><option value="P">P</option><option value="F">F</option></select></td>
             </tr>
         </table>
+        
+        <div class="feedback-box" id="feedback-1">
+            <h4>Poprawne odpowiedzi (Zadanie 1):</h4>
+            <ul>
+                <li><strong>F</strong> (Po raz pierwszy zobaczył ją w teatrze, kwesta była później).</li>
+                <li><strong>F</strong> (Marianna nie znała Starskiego, pomoc Wokulskiego wynikała z chęci wyciągnięcia jej z nędzy / pracy u podstaw).</li>
+                <li><strong>F</strong> (Najlepszym subiektem był Mraczewski. Maruszewicz to oszust i znajomy Krzeszowskiego).</li>
+                <li><strong>P</strong> (W młodości kochała się w stryju Stanisława Wokulskiego).</li>
+                <li><strong>F</strong> (Pojedynkował się z powodu zniewagi, jakiej baron dopuścił się wobec Izabeli na wyścigach konnych).</li>
+                <li><strong>P</strong> (Powieść zamyka scena śmierci Ignacego w sklepie i słowa "Non omnis moriar").</li>
+            </ul>
+        </div>
 
         <h3>2. Do postaci dopasuj odpowiedni opis. [0–2 pkt]</h3>
         <div class="options-list">
@@ -203,6 +215,14 @@
             <div id="row2_molinari"><label>Molinari</label><select id="z2_molinari"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
             <div id="row2_wasowska"><label>Kazimiera Wąsowska</label><select id="z2_wasowska"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
             <div id="row2_hortensja"><label>Hortensja</label><select id="z2_hortensja"><option value="">-</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option><option value="E">E</option><option value="F">F</option><option value="G">G</option><option value="H">H</option><option value="I">I</option><option value="J">J</option><option value="K">K</option><option value="L">L</option></select></div>
+        </div>
+        
+        <div class="feedback-box" id="feedback-2">
+            <h4>Poprawne odpowiedzi (Zadanie 2):</h4>
+            <p>
+                Tomasz Łęcki – <strong>I</strong>, Ignacy Rzecki – <strong>J</strong>, Julian Ochocki – <strong>F</strong>, Prezesowa Zasławska – <strong>E</strong>, Kazimierz Starski – <strong>H</strong>, Książę – <strong>C</strong>, Pani Meliton – <strong>K</strong>, Rossi – <strong>B</strong>, Molinari – <strong>L</strong>, Kazimiera Wąsowska – <strong>G</strong>, Hortensja – <strong>A</strong>.
+                <br><br><small><em>(W oryginalnym teście dla Izabeli nie ma perfekcyjnie pasującej odpowiedzi, dlatego ten jeden punkt nie był rygorystycznie zliczany przez skrypt).</em></small>
+            </p>
         </div>
 
         <h3>3. O czym marzyli bohaterowie Lalki? [0–3 pkt]</h3>
@@ -353,8 +373,8 @@
 
         autoPoints = ptsZ1 + ptsZ2;
 
-        // Pokaż klucze odpowiedzi do zadań otwartych
-        for(let i=3; i<=8; i++) {
+        // Pokaż klucze odpowiedzi do WSZYSTKICH zadań (od 1 do 8)
+        for(let i=1; i<=8; i++) {
             document.getElementById('feedback-'+i).style.display = 'block';
         }
 
@@ -362,7 +382,7 @@
         document.getElementById('btn-check-answers').style.display = 'none';
         document.getElementById('btn-calculate').style.display = 'block';
         
-        alert("Zadania zamknięte zostały ocenione automatycznie! \n\nZjedź w dół, przeczytaj klucze odpowiedzi do zadań otwartych i oceń się wybierając odpowiednią liczbę punktów z żółtych rozwijanych list. Na koniec kliknij zielony przycisk obliczania wyniku.");
+        alert("Zadania zamknięte zostały ocenione automatycznie! \n\nZjedź w dół, zobaczysz poprawne odpowiedzi do każdego z nich. Następnie przeczytaj klucze do zadań otwartych i oceń się, wybierając punkty z żółtych list. Na koniec kliknij zielony przycisk obliczania wyniku.");
     }
 
     function calculateFinalScore() {
